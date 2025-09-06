@@ -1,1 +1,54 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: payment-service
+  cloud:
+    function:
+      definition: paymentRequest
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost}:9092
+          auto-create-topics: true
+        bindings:
+          paymentRequest-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: payment.requests.dlq
+              auto-commit-on-error: false
+      bindings:
+        # Inbound: requests from Order Service
+        paymentRequest-in-0:
+          destination: payment.requests
+          group: payment-service
+        # Outbound: responses to Order Service
+        paymentResponse-out-0:
+          destination: payment.responses
+          content-type: application/json
+
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:payment_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+
+
+logging:
+  level:
+    root: INFO
 
