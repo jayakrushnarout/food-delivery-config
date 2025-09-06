@@ -1,0 +1,76 @@
+server:
+  port: 8086
+
+spring:
+  app:
+    jwtSecret: d2lraV9zZWNyZXRfa2V5X2Zvcl9hcGlfZ2F0ZXdheV9hbmRfamlm
+
+  application:
+    name: dlq-consumer-service
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:dlq_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  cloud:
+    function:
+      definition: deliveryRequestsDlq;deliveryResponsesDlq;paymentRequestsDlq;paymentResponsesDlq;restaurantValidationRequestsDlq;restaurantValidationResponsesDlq
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost}:9092
+      bindings:
+        deliveryRequestsDlq-in-0:
+          destination: delivery.requests.dlq
+          group: dlq-consumer-group
+        deliveryResponsesDlq-in-0:
+          destination: delivery.responses.dlq
+          group: dlq-consumer-group
+        paymentRequestsDlq-in-0:
+          destination: payment.requests.dlq
+          group: dlq-consumer-group
+        paymentResponsesDlq-in-0:
+          destination: payment.responses.dlq
+          group: dlq-consumer-group
+        restaurantValidationRequestsDlq-in-0:
+          destination: restaurant.validation.requests.dlq
+          group: dlq-consumer-group
+        restaurantValidationResponsesDlq-in-0:
+          destination: restaurant.validation.responses.dlq
+          group: dlq-consumer-group
+
+        paymentRequests-out-0:
+          destination: payment.requests
+        paymentResponses-out-0:
+          destination: payment.responses
+        deliveryRequests-out-0:
+          destination: delivery.requests
+        deliveryResponses-out-0:
+          destination: delivery.responses
+        restaurantValidationRequests-out-0:
+          destination: restaurant.validation.requests
+        restaurantValidationResponses-out-0:
+          destination: restaurant.validation.responses
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+
+logging:
+  level:
+    root: INFO
