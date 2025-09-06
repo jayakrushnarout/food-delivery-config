@@ -1,47 +1,45 @@
-
-
 spring:
   application:
     name: api-gateway
+
   app:
     jwtSecret: d2lraV9zZWNyZXRfa2V5X2Zvcl9hcGlfZ2F0ZXdheV9hbmRfamlm
 
   cloud:
     gateway:
-      server:
-        webflux:
-          discovery:
-            locator:
-              enabled: true
-              lower-case-service-id: true
-          routes:
-            - id: order-service
-              uri: lb://order-service
-              predicates:
-                - Path=/orders/**
-            - id: payment-service
-              uri: lb://payment-service
-              predicates:
-                - Path=/payments/**
-            - id: restaurant-service
-              uri: lb://restaurant-service
-              predicates:
-                - Path=/restaurants/**
-            - id: delivery-service
-              uri: lb://delivery-service
-              predicates:
-                - Path=/delivery/**
-            - id: auth-service
-              uri: lb://auth-service
-              predicates:
-                - Path=/auth/**
-            - id: dlq-consumer-service
-              uri: lb://dlq-consumer-service
-              predicates:
-                - Path=/dlq/**
+      discovery:
+        locator:
+          enabled: true
+          lower-case-service-id: true
+      routes:
+        - id: order-service
+          uri: lb://order-service
+          predicates:
+            - Path=/orders/**
+        - id: payment-service
+          uri: lb://payment-service
+          predicates:
+            - Path=/payments/**
+        - id: restaurant-service
+          uri: lb://restaurant-service
+          predicates:
+            - Path=/restaurants/**
+        - id: delivery-service
+          uri: lb://delivery-service
+          predicates:
+            - Path=/delivery/**
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth/**
+        - id: dlq-consumer-service
+          uri: lb://dlq-consumer-service
+          predicates:
+            - Path=/dlq/**
+
 logging:
-    level:
-        root: INFO
+  level:
+    root: INFO
 
 eureka:
   client:
@@ -49,5 +47,3 @@ eureka:
       defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
     register-with-eureka: true
     fetch-registry: true
-
-
