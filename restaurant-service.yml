@@ -1,1 +1,56 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: restaurant-service
+
+  app:
+    jwtSecret: d2lraV9zZWNyZXRfa2V5X2Zvcl9hcGlfZ2F0ZXdheV9hbmRfamlm
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:restaurant_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+  cloud:
+    function:
+      definition: restaurantValidation
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost}:9092
+          auto-create-topics: true
+
+        bindings:
+          restaurantValidation-in-0:
+            consumer:
+              enableDlq: true
+              dlqName: restaurant.validation.requests.dlq  # DLQ topic
+              autoCommitOnError: false
+      bindings:
+        restaurantValidation-in-0:
+          destination: restaurant.validation.requests
+          group: restaurant-service
+          content-type: application/json
+        restaurantValidation-out-0:
+          destination: restaurant.validation.responses
+          content-type: application/json
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    root: INFO
 
