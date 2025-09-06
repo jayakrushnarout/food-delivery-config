@@ -1,5 +1,4 @@
-server:
-  port: 8080   # Gateway will run on 8080
+
 
 spring:
   application:
