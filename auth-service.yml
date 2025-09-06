@@ -1,1 +1,57 @@
 
+server:
+  port: 8081
+
+spring:
+  application:
+    name: auth-service
+  app:
+   jwtSecret: d2lraV9zZWNyZXRfa2V5X2Zvcl9hcGlfZ2F0ZXdheV9hbmRfamlm
+   jwtExpirationMs: 3600000
+
+
+#Email Configuration
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: jayakrushnarout99@gmail.com
+    password: paav epjn dhkk mobx  # replace with your Gmail App Password
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Database Configuration
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:auth_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update       # Options: create, update, validate, none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+#Eureka Client Configuration
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+    org.springframework.security.web.server: DEBUG
+    org.springframework.security.oauth2: DEBUG
+    org.springframework.security.oauth2.server.resource: DEBUG
+    root: INFO
+
+
