@@ -1,1 +1,58 @@
 
+server:
+  port: 8085
+
+spring:
+  application:
+    name: delivery-service
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:delivery_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update       # Options: create, update, validate, none
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost}:9092
+          auto-create-topics: true
+        bindings:
+          deliveryRequest-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: delivery.requests.dlq
+              auto-commit-on-error: false
+      bindings:
+        # ---- Incoming Topics ----
+        deliveryRequest-in-0:
+          destination: delivery.requests
+          group: delivery-service
+          content-type: application/json
+
+        # ---- Outgoing Topics ----
+        deliveryResponse-out-0:
+          destination: delivery.responses
+          content-type: application/json
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+
+logging:
+  level:
+    root: info
+
