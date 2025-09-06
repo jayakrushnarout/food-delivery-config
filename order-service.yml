@@ -1,1 +1,111 @@
+server:
+  port: 8083
 
+spring:
+  application:
+    name: order-service
+
+  app:
+    jwtSecret: d2lraV9zZWNyZXRfa2V5X2Zvcl9hcGlfZ2F0ZXdheV9hbmRfamlm
+
+  datasource:
+    url: jdbc:mysql://${MYSQL_HOST:localhost}:${MYSQL_PORT:3306}/${MYSQL_DB:order_db}?serverTimezone=UTC
+    username: ${MYSQL_USER:root}
+    password: ${MYSQL_PASSWORD:Info@2k22}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+
+  cloud:
+    function:
+      definition: restaurantValidationConsumer;paymentResponse;deliveryResponse
+
+    stream:
+      kafka:
+        binder:
+          brokers: ${KAFKA_BROKER:localhost}:9092
+          auto-create-topics: true
+
+        bindings:
+          # DLQ configuration per consumer
+          restaurantValidationConsumer-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: restaurant.validation.responses.dlq
+              auto-commit-on-error: false
+
+          paymentResponse-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: payment.responses.dlq
+              auto-commit-on-error: false
+
+          deliveryResponse-in-0:
+            consumer:
+              enable-dlq: true
+              dlq-name: delivery.responses.dlq
+              auto-commit-on-error: false
+
+      bindings:
+        # Outbound events to other services
+        restaurantValidation-out-0:
+          destination: restaurant.validation.requests
+        paymentRequest-out-0:
+          destination: payment.requests
+        deliveryRequest-out-0:
+          destination: delivery.requests
+
+        # Inbound events from other services
+        restaurantValidationConsumer-in-0:
+          destination: restaurant.validation.responses
+          group: order-service-restaurant
+          content-type: application/json
+          consumer:
+            auto-startup: true
+
+        paymentResponse-in-0:
+          destination: payment.responses
+          group: order-service-payment
+          content-type: application/json
+          consumer:
+            auto-startup: true
+
+        deliveryResponse-in-0:
+          destination: delivery.responses
+          group: order-service-delivery
+          content-type: application/json
+          consumer:
+            auto-startup: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${EUREKA_SERVER_URL:localhost}:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: bindings,channels,health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.springframework.cloud.stream: DEBUG
+    org.springframework.kafka: DEBUG
+    com.springcloud.order_service: DEBUG
+    org.springframework.cloud.function: DEBUG
+    org.apache.kafka.clients.consumer: DEBUG
+    org.springframework.kafka.listener: DEBUG
+    root: INFO
