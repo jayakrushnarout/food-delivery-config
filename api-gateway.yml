@@ -13,19 +13,19 @@ spring:
           lower-case-service-id: true
       routes:
         - id: order-service
-          uri: lb://order-service
+          uri:  http://order-service.microservices.local:8083
           predicates:
             - Path=/orders/**
         - id: payment-service
-          uri: lb://payment-service
+          uri: http://payment-service.microservices.local:8084
           predicates:
             - Path=/payments/**
         - id: restaurant-service
-          uri: lb://restaurant-service
+          uri: http://restaurant-service.microservices.local:8082
           predicates:
             - Path=/restaurants/**
         - id: delivery-service
-          uri: lb://delivery-service
+          uri: http://delivery-service.microservices.local:8085
           predicates:
             - Path=/delivery/**
         - id: auth-service
@@ -33,7 +33,7 @@ spring:
           predicates:
             - Path=/auth/**
         - id: dlq-consumer-service
-          uri: lb://dlq-consumer-service
+          uri: http://dlq-consumer.microservices.local:8086
           predicates:
             - Path=/dlq/**
 
