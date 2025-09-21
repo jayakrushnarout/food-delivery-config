@@ -29,7 +29,7 @@ spring:
           predicates:
             - Path=/delivery/**
         - id: auth-service
-          uri: lb://auth-service
+          uri: http://auth-service.microservices.local:8081
           predicates:
             - Path=/auth/**
         - id: dlq-consumer-service
