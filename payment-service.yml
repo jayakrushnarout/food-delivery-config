@@ -11,7 +11,7 @@ spring:
       kafka:
         binder:
           brokers: ${KAFKA_BROKER:localhost}:9092
-          auto-create-topics: true
+          auto-create-topics: false
         bindings:
           paymentRequest-in-0:
             consumer:
