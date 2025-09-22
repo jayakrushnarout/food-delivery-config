@@ -31,7 +31,8 @@ spring:
       kafka:
         binder:
           brokers: ${KAFKA_BROKER:localhost}:9092
-          auto-create-topics: true
+          # i disable the auto-create topic for production
+          auto-create-topics: false
 
         bindings:
           # DLQ configuration per consumer
